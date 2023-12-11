@@ -1,0 +1,39 @@
+body {
+  background-color: #1e1e1e;
+  font-family: "Courier New", monospace;
+}
+
+#input-area,
+#hint-area,
+#background {
+  font-size: 18px;
+  height: 89ch;
+  padding: 10px;
+  margin: 10px;
+  resize: none;
+  box-sizing: content-box;
+  position: absolute;
+  border: 0;
+}
+
+#background {
+  width: 79ch;
+  background-color: #252526;
+}
+
+#hint-area {
+  width: 120ch;
+  background-color: transparent;
+  color: hotpink;
+  pointer-events: none;
+}
+
+#input-area {
+  width: 120ch;
+  background-color: transparent;
+  color: #dcdcdc;
+}
+
+#input-area:focus {
+  outline: none;
+}
