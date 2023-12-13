@@ -1,12 +1,11 @@
 body {
   background-color: #1e1e1e;
-  font-family: "Courier New", monospace;
+  font-family: monospace;
 }
 
 #input-area,
 #hint-area,
 #background {
-  font-size: 18px;
   height: 89ch;
   padding: 10px;
   margin: 10px;
