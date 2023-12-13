@@ -66,15 +66,10 @@ def preprocess_chunk(args: PreprocessingArgs, filename) -> None:
     if args.filter_ast_parsable:
         df = df.loc[df["content"].apply(lambda x: ast_parsable(x))]
 
-    df["ast_parsable"] = df["content"].apply(lambda x: ast_parsable(x))
-    df = df.loc[df["ast_parsable"]]
-
     df["tokens"] = df["content"].apply(lambda x: tokenizer.encode(x))
     df = df.set_index("hexsha").loc[:, ["tokens", "content"]]
 
     df.to_parquet(f"{args.output_path}/{filename}")
-    del df
-    del tokenizer
 
 
 def preprocess(args: PreprocessingArgs) -> None:
