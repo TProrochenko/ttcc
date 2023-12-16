@@ -1,21 +1,58 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const editor = new Editor();
-  editor.init();
-});
-
 class Editor {
   constructor() {
-    this.input = document.getElementById("input-area");
+    this.code = document.getElementById("code-area");
     this.hint = document.getElementById("hint-area");
+    this.lang = document.getElementById("language");
+    this.loadingBar = document.getElementById("loading-bar");
+    this.loadingProgress = document.getElementById("loading-progress");
     this.timeout = null;
+
+    this.code.addEventListener("input", () => this.debounceInput());
+    this.code.addEventListener("click", () => this.clearHintArea());
+    this.code.addEventListener("keydown", (event) => this.handleKeyDown(event));
+    this.lang.addEventListener("change", () => this.initModel(this.lang.value));
+
+    Module.onRuntimeInitialized = () => {
+      this.initModel(this.lang.value);
+    };
   }
 
-  init() {
-    this.input.addEventListener("input", () => this.debounceInput());
-    this.input.addEventListener("click", () => this.clearMirrorArea());
-    this.input.addEventListener("keydown", (event) =>
-      this.handleKeyDown(event)
-    );
+  async initModel(filename) {
+    try {
+      let received = 0;
+      this.loadingProgress.value = 0;
+      this.code.readOnly = true;
+      this.loadingBar.style.display = "block";
+
+      const response = await fetch("models/" + filename);
+      const reader = response.body.getReader();
+      const expected = response.headers.get("Content-Length");
+      let uint8Array = new Uint8Array(expected);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        uint8Array.set(value, received);
+        received += value.length;
+        this.loadingProgress.value = received / expected;
+      }
+
+      Module.FS.writeFile(filename, uint8Array);
+      Module.cwrap("init", null, ["string"])(filename);
+    } catch (error) {
+      console.error(error.message);
+    }
+
+    this.loadingBar.style.display = "none";
+    this.resetInputs();
+  }
+
+  resetInputs() {
+    this.code.readOnly = false;
+    this.code.value = "";
+    this.hint.value = "";
+    this.code.focus();
   }
 
   debounceInput() {
@@ -24,24 +61,20 @@ class Editor {
   }
 
   handleInput() {
-    if (this.isCaretAtEnd()) {
-      this.getAutocompleteSuggestion();
-    } else {
-      this.trimAfterCaret();
-    }
+    if (this.isCaretAtEnd()) this.getSuggestion();
   }
 
-  clearMirrorArea() {
-    if (!this.isCaretAtEnd()) {
-      this.hint.value = "";
-    }
+  clearHintArea() {
+    if (!this.isCaretAtEnd()) this.hint.value = "";
   }
 
   handleKeyDown(event) {
     switch (event.key) {
       case "Tab":
         event.preventDefault();
-        this.hint.value ? this.applySuggestion() : this.insertTabAtCaret();
+        this.hint.value.slice(this.code.value.length)
+          ? this.applySuggestion()
+          : this.insertTabAtCaret();
         break;
       case "ArrowLeft":
       case "ArrowRight":
@@ -53,43 +86,30 @@ class Editor {
     }
   }
 
-  getAutocompleteSuggestion() {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "http://localhost:5000/autocomplete", true);
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        const response = JSON.parse(xhr.responseText);
-        this.hint.value = this.input.value.replace(/./g, " ") + response;
-      }
-    };
-    xhr.send(JSON.stringify(this.input.value));
+  getSuggestion() {
+    const complete = Module.cwrap("complete", "string", ["string"]);
+    var completion = complete(this.code.value).slice(this.code.value.length);
+    this.hint.value = this.code.value.replace(/./g, " ") + completion;
   }
 
   insertTabAtCaret() {
-    const caretPosition = this.input.selectionStart;
-    const beforeCaret = this.input.value.substring(0, caretPosition);
-    const afterCaret = this.input.value.substring(caretPosition);
-    this.input.value = beforeCaret + "    " + afterCaret;
-    this.input.selectionStart = this.input.selectionEnd = caretPosition + 4;
-  }
-
-  trimAfterCaret() {
-    const caretPosition = this.input.selectionStart;
-    const beforeCaret = this.input.value.substring(0, caretPosition);
-    const afterCaret = this.input.value.substring(caretPosition);
-    this.input.value = beforeCaret + afterCaret.trimEnd();
+    const caretPosition = this.code.selectionStart;
+    const beforeCaret = this.code.value.substring(0, caretPosition);
+    const afterCaret = this.code.value.substring(caretPosition);
+    this.code.value = beforeCaret + "    " + afterCaret;
+    this.code.selectionStart = this.code.selectionEnd = caretPosition + 4;
   }
 
   applySuggestion() {
-    this.input.value += this.hint.value.slice(this.input.value.length);
-    this.input.selectionStart = this.input.selectionEnd =
-      this.input.value.length;
+    this.code.value += this.hint.value.slice(this.code.value.length);
+    this.code.selectionStart = this.code.selectionEnd = this.code.value.length;
     this.hint.value = "";
     this.handleInput();
   }
 
   isCaretAtEnd() {
-    return this.input.value.length === this.input.selectionStart;
+    return this.code.value.length === this.code.selectionStart;
   }
 }
+
+document.addEventListener("DOMContentLoaded", () => new Editor());

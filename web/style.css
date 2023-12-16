@@ -3,12 +3,13 @@ body {
   font-family: monospace;
 }
 
-#input-area,
+#code-area,
 #hint-area,
 #background {
   height: 89ch;
-  padding: 10px;
-  margin: 10px;
+  top: 5ch;
+  left: 2ch;
+  padding: 1ch;
   resize: none;
   box-sizing: content-box;
   position: absolute;
@@ -27,12 +28,36 @@ body {
   pointer-events: none;
 }
 
-#input-area {
+#code-area {
   width: 120ch;
   background-color: transparent;
   color: #dcdcdc;
 }
 
-#input-area:focus {
+#code-area:focus {
   outline: none;
+}
+
+#language {
+  font-family: monospace;
+  position: absolute;
+  width: 14ch;
+  top: 1ch;
+  left: 2ch;
+  background-color: #1e1e1e;
+  color: #a9a9a9;
+  border: none;
+  outline: none;
+}
+
+#loading-bar {
+  position: absolute;
+  display: none;
+  top: 1ch;
+  left: 20ch;
+}
+
+#loading-progress {
+  width: 63ch;
+  height: 1ch;
 }
