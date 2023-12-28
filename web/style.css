@@ -1,19 +1,19 @@
 body {
   background-color: #1e1e1e;
-  font-family: monospace;
 }
 
 #code-area,
 #hint-area,
 #background {
+  font-family: monospace;
   height: 89ch;
   top: 5ch;
   left: 2ch;
-  padding: 1ch;
   resize: none;
   box-sizing: content-box;
   position: absolute;
   border: 0;
+  tab-size: 4;
 }
 
 #background {
@@ -58,6 +58,7 @@ body {
 }
 
 #loading-progress {
-  width: 63ch;
-  height: 1ch;
+  appearance: none;
+  width: 20ch;
+  height: 2ch;
 }

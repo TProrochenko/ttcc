@@ -9,28 +9,37 @@
     <script src="complete.js"></script>
   </head>
   <body>
-    <select id="language">
-      <option value="py-frosty-sound-6m.bin" selected>Python</option>
-      <option value="js-still-universe-6m.bin">JavaScript</option>
+    <label for="language"></label
+    ><select id="language">
+      <option value="c-jumping-water.bin" selected>C</option>
+      <option value="cpp-vocal-sunset.bin">C++</option>
+      <option value="go-cerulean-dust.bin">Go</option>
+      <option value="js-still-universe.bin">JavaScript</option>
+      <option value="kotlin-sparkling-cosmos.bin">Kotlin</option>
+      <option value="py-frosty-sound.bin">Python</option>
+      <option value="rust-driven-darkness.bin">Rust</option>
     </select>
     <div id="loading-bar">
       <progress id="loading-progress" value="0" max="1"></progress>
     </div>
     <div class="container">
-      <textarea
+      <label for="background"></label
+      ><textarea
         id="background"
         readonly
         spellcheck="false"
         autocomplete="off"
         data-gramm="false"
       ></textarea>
-      <textarea
+      <label for="hint-area"></label
+      ><textarea
         id="hint-area"
         spellcheck="false"
         autocomplete="off"
         data-gramm="false"
       ></textarea>
-      <textarea
+      <label for="code-area"></label
+      ><textarea
         id="code-area"
         spellcheck="false"
         autocomplete="off"

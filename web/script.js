@@ -46,6 +46,7 @@ class Editor {
 
     this.loadingBar.style.display = "none";
     this.resetInputs();
+    this.getSuggestion();
   }
 
   resetInputs() {
@@ -89,7 +90,7 @@ class Editor {
   getSuggestion() {
     const complete = Module.cwrap("complete", "string", ["string"]);
     var completion = complete(this.code.value).slice(this.code.value.length);
-    this.hint.value = this.code.value.replace(/./g, " ") + completion;
+    this.hint.value = this.code.value.replace(/[^\n\t]/g, " ") + completion;
   }
 
   insertTabAtCaret() {
