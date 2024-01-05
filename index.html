@@ -4,21 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ttcc</title>
-    <link rel="shortcut icon" href="#" />
-    <link rel="stylesheet" href="style.css" />
-    <script src="complete.js"></script>
+    <link rel="icon" href="web/favicon.svg" />
+    <link rel="stylesheet" href="web/style.css" />
+    <script src="web/model.js"></script>
   </head>
   <body>
     <label for="language"></label
     ><select id="language">
-      <option value="c-jumping-water.bin" selected>C</option>
-      <option value="cpp-vocal-sunset.bin">C++</option>
+      <option value="c-glorious-sun.bin">C</option>
+      <option value="cpp-tough-glitter.bin">C++</option>
       <option value="go-cerulean-dust.bin">Go</option>
-      <option value="js-still-universe.bin">JavaScript</option>
+      <option value="java-twilight-silence.bin">Java</option>
+      <option value="javascript-divine-blaze.bin">JavaScript</option>
       <option value="kotlin-sparkling-cosmos.bin">Kotlin</option>
-      <option value="py-frosty-sound.bin">Python</option>
+      <option value="php-smooth-plant.bin">PHP</option>
+      <option value="python-lemon-violet.bin" selected>Python</option>
       <option value="rust-driven-darkness.bin">Rust</option>
+      <option value="typescript-vibrant-grass.bin">TypeScript</option>
     </select>
+    <a id="github-link" href="https://github.com/tprorochenko" target="_blank"
+      >github</a
+    >
     <div id="loading-bar">
       <progress id="loading-progress" value="0" max="1"></progress>
     </div>
@@ -34,6 +40,7 @@
       <label for="hint-area"></label
       ><textarea
         id="hint-area"
+        readonly
         spellcheck="false"
         autocomplete="off"
         data-gramm="false"
@@ -46,6 +53,6 @@
         data-gramm="false"
       ></textarea>
     </div>
-    <script src="script.js"></script>
+    <script src="web/script.js"></script>
   </body>
 </html>

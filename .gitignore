@@ -1,5 +1,8 @@
+/.idea/
+/.vscode/
+/.ipynb_checkpoints/
+/models/
 /data/
 /venv/
-/*.ipynb
 /wandb/
-/models/
+/training/*.ipynb

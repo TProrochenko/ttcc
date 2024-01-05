@@ -8,7 +8,7 @@ class Editor {
     this.timeout = null;
 
     this.code.addEventListener("input", () => this.debounceInput());
-    this.code.addEventListener("click", () => this.clearHintArea());
+    this.code.addEventListener("click", () => this.clearHint());
     this.code.addEventListener("keydown", (event) => this.handleKeyDown(event));
     this.lang.addEventListener("change", () => this.initModel(this.lang.value));
 
@@ -46,13 +46,12 @@ class Editor {
 
     this.loadingBar.style.display = "none";
     this.resetInputs();
-    this.getSuggestion();
   }
 
   resetInputs() {
     this.code.readOnly = false;
     this.code.value = "";
-    this.hint.value = "";
+    this.clearHint();
     this.code.focus();
   }
 
@@ -65,8 +64,9 @@ class Editor {
     if (this.isCaretAtEnd()) this.getSuggestion();
   }
 
-  clearHintArea() {
-    if (!this.isCaretAtEnd()) this.hint.value = "";
+  clearHint() {
+    this.hint.value = "";
+    this.code.style.caretColor = "#dcdcdc";
   }
 
   handleKeyDown(event) {
@@ -82,7 +82,7 @@ class Editor {
       case "ArrowUp":
       case "ArrowDown":
       case "Escape":
-        this.hint.value = "";
+        this.clearHint();
         break;
     }
   }
@@ -90,6 +90,11 @@ class Editor {
   getSuggestion() {
     const complete = Module.cwrap("complete", "string", ["string"]);
     var completion = complete(this.code.value).slice(this.code.value.length);
+    if (completion.length > 0) {
+      this.code.style.caretColor = "hotpink";
+    } else {
+      this.code.style.caretColor = "#dcdcdc";
+    }
     this.hint.value = this.code.value.replace(/[^\n\t]/g, " ") + completion;
   }
 
@@ -104,7 +109,7 @@ class Editor {
   applySuggestion() {
     this.code.value += this.hint.value.slice(this.code.value.length);
     this.code.selectionStart = this.code.selectionEnd = this.code.value.length;
-    this.hint.value = "";
+    this.clearHint();
     this.handleInput();
   }
 

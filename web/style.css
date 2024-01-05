@@ -1,24 +1,26 @@
 body {
   background-color: #1e1e1e;
+  font-family: monospace;
 }
 
 #code-area,
 #hint-area,
 #background {
   font-family: monospace;
-  height: 89ch;
+  height: 90ch;
   top: 5ch;
   left: 2ch;
   resize: none;
-  box-sizing: content-box;
+  box-sizing: border-box;
   position: absolute;
   border: 0;
   tab-size: 4;
 }
 
 #background {
-  width: 79ch;
+  width: 80ch;
   background-color: #252526;
+  pointer-events: none;
 }
 
 #hint-area {
@@ -32,6 +34,7 @@ body {
   width: 120ch;
   background-color: transparent;
   color: #dcdcdc;
+  caret-color: #dcdcdc;
 }
 
 #code-area:focus {
@@ -52,13 +55,29 @@ body {
 
 #loading-bar {
   position: absolute;
-  display: none;
-  top: 1ch;
-  left: 20ch;
+  top: 3ch;
+  left: 2ch;
 }
 
 #loading-progress {
   appearance: none;
-  width: 20ch;
-  height: 2ch;
+  width: 82ch;
+  height: 1ch;
+}
+
+#loading-progress::-webkit-progress-bar {
+  background-color: #252526;
+}
+
+progress::-webkit-progress-value {
+  background-color: hotpink;
+}
+
+#github-link {
+  font-family: monospace;
+  position: absolute;
+  top: 1ch;
+  left: 78ch;
+  color: #a9a9a9;
+  text-decoration: none;
 }
