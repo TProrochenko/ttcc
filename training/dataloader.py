@@ -6,6 +6,7 @@ import pandas as pd
 import torch
 
 from args import TrainingArgs
+from tokenizer import Tokenizer
 
 
 class DataLoader:
@@ -27,13 +28,15 @@ class DataLoader:
         self.seed = args.seed
         self.epochs = epochs if epochs else args.epochs
         self.approx_chunk_tokens = args.approx_chunk_tokens
+        self.tokenizer = Tokenizer()
 
     def __iter__(self) -> ((torch.tensor, torch.tensor), dict):
         step = 0
         for epoch in range(self.epochs):
             tokens = torch.empty(size=[0], dtype=torch.uint8)
             for chunk_num, chunk_name in enumerate(self.chunk_names):
-                series = pd.read_parquet(f"{self.dataset_dir}/{chunk_name}")["tokens"]
+                series = pd.read_parquet(f"{self.dataset_dir}/{chunk_name}")["content"]
+                series = series.apply(lambda s: self.tokenizer.encode(s))
                 samples = [torch.tensor(sample, dtype=torch.uint8) for sample in series]
                 del series
 

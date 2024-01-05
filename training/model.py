@@ -262,15 +262,15 @@ class Transformer(nn.Module):
         return idx
 
     @torch.inference_mode()
-    def generate(self, tokens, temperature=0.8):
+    def generate(self, tokens, threshold=0.5):
         next_tok_prob = 1.0
         while True:
             tokens = tokens[:, -self.params.max_seq_len:]
-            logits = self(tokens)[:, -1, :] / temperature
+            logits = self(tokens)[:, -1, :]
             probs = nn.functional.softmax(logits, dim=-1)
             next_tok = torch.argmax(probs, keepdim=True)
             next_tok_prob *= torch.max(probs)
-            if (next_tok_prob > 0.5) and (next_tok != 3):
+            if (next_tok_prob > threshold) and (next_tok != 3):
                 tokens = torch.cat((tokens, next_tok), dim=1)
             else:
                 return tokens

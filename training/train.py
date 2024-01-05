@@ -6,19 +6,44 @@ from args import ModelArgs, TrainingArgs, PreprocessingArgs
 from dataloader import DataLoader
 from model import Transformer
 from utils import create_optimizer, create_scheduler
-
+from export import load_checkpoint
 
 model_args = ModelArgs()
 training_args = TrainingArgs()
 preprocessing_args = PreprocessingArgs()
 
-train_dl = DataLoader(training_args, dataset_dir="data/train")
-val_dl = DataLoader(training_args, dataset_dir="data/val", shuffle=False, epochs=1)
+train_dl = DataLoader(
+    training_args,
+    dataset_dir=f"data/processed/{preprocessing_args.langs[0]}/train"
+)
+
+val_dl = DataLoader(
+    training_args,
+    dataset_dir=f"data/processed/{preprocessing_args.langs[0]}/val",
+    shuffle=False,
+)
+
 training_args.steps = len(train_dl)
 
 
-model = Transformer(model_args)
-model.to(training_args.device)
+# model = Transformer(model_args)
+
+###########################
+model = load_checkpoint(checkpoint="../models/mix-fallen-oath.pt", map_location="cuda")
+# checkpoint_dict = torch.load("../models/mix-fallen-oath.pt", map_location="cuda")
+# model = Transformer(checkpoint_dict["model_args"])
+# state_dict = checkpoint_dict["model"]
+#
+# unwanted_prefix = "_orig_mod."
+# for k, v in list(state_dict.items()):
+#     if k.startswith(unwanted_prefix):
+#         state_dict[k[len(unwanted_prefix) :]] = state_dict.pop(k)
+# model.load_state_dict(state_dict, strict=False)
+# del state_dict
+# del checkpoint_dict
+###########################
+
+# model.to(training_args.device)
 model: Transformer = torch.compile(model)
 model_args.total_model_params = sum(p.numel() for p in model.parameters())
 
@@ -67,3 +92,12 @@ for batch, stats in pbar:
     optimizer.step()
     scheduler.step()
     optimizer.zero_grad()
+
+
+checkpoint = {
+    "model": model.state_dict(),
+    "optimizer": optimizer.state_dict(),
+    "model_args": model_args,
+    "config": config,
+}
+torch.save(checkpoint, f="models/ckpt.pt")

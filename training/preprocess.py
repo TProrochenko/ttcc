@@ -11,7 +11,6 @@ import pandas as pd
 from tqdm import tqdm
 
 from args import PreprocessingArgs
-from tokenizer import Tokenizer
 
 
 def allowed_characters(text):
@@ -37,26 +36,31 @@ def python_tokenize(text):
         return -1
 
 
-def preprocess_chunk(args: PreprocessingArgs, filename) -> None:
-    tokenizer = Tokenizer()
-    df = pd.read_parquet(f"{args.source_path}/{filename}")
+def preprocess_chunk(args: PreprocessingArgs, lang, filename) -> None:
+    df = pd.read_parquet(f"{args.source_path}/{lang}/{filename}")
     if args.filter_ext:
         df = df.loc[df["ext"].isin(args.valid_ext)]
 
     if args.filter_size:
-        df = df.loc[df["size"].between(args.min_size, args.max_size)]
+        df = df.loc[
+            df["size"].between(
+                df["size"].quantile(args.min_size), df["size"].quantile(args.max_size)
+            )
+        ]
 
     if args.filter_max_line_length:
         df = df.loc[
             df["max_line_length"].between(
-                args.min_max_line_length, args.max_max_line_length
+                df["max_line_length"].quantile(args.min_max_line_length),
+                df["max_line_length"].quantile(args.max_max_line_length),
             )
         ]
 
     if args.filter_avg_line_length:
         df = df.loc[
             df["avg_line_length"].between(
-                args.min_avg_line_length, args.max_avg_line_length
+                df["avg_line_length"].quantile(args.min_avg_line_length),
+                df["avg_line_length"].quantile(args.max_avg_line_length),
             )
         ]
 
@@ -66,22 +70,22 @@ def preprocess_chunk(args: PreprocessingArgs, filename) -> None:
     if args.filter_ast_parsable:
         df = df.loc[df["content"].apply(lambda x: ast_parsable(x))]
 
-    df["tokens"] = df["content"].apply(lambda x: tokenizer.encode(x))
-    df = df.set_index("hexsha").loc[:, ["tokens", "content"]]
+    df = df.set_index("hexsha").loc[:, ["content"]]
 
-    df.to_parquet(f"{args.output_path}/{filename}")
+    df.to_parquet(f"{args.output_path}/{lang}/{filename}")
 
 
 def preprocess(args: PreprocessingArgs) -> None:
-    filenames = os.listdir(args.source_path)
+    for lang in args.langs:
+        filenames = sorted(os.listdir(f"{args.source_path}/{lang}"))
 
-    with multiprocessing.Pool(processes=3) as pool:
-        partial_preprocess_chunk = partial(preprocess_chunk, args)
-        for _ in tqdm(
-            pool.imap_unordered(partial_preprocess_chunk, filenames),
-            total=len(filenames),
-        ):
-            pass
+        with multiprocessing.Pool(processes=3) as pool:
+            partial_preprocess_chunk = partial(preprocess_chunk, args, lang)
+            for _ in tqdm(
+                pool.imap_unordered(partial_preprocess_chunk, filenames),
+                total=len(filenames),
+            ):
+                pass
 
 
 if __name__ == "__main__":
