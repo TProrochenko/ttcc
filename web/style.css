@@ -41,16 +41,26 @@ body {
   outline: none;
 }
 
-#language {
+#top-row {
   font-family: monospace;
+  color: #a9a9a9;
+  align-items: center;
   position: absolute;
-  width: 14ch;
+  display: block;
   top: 1ch;
   left: 2ch;
+}
+
+#language {
+  font-family: monospace;
   background-color: #1e1e1e;
   color: #a9a9a9;
   border: none;
   outline: none;
+}
+
+#github-link {
+  color: #a9a9a9;
 }
 
 #loading-bar {
@@ -71,13 +81,4 @@ body {
 
 progress::-webkit-progress-value {
   background-color: hotpink;
-}
-
-#github-link {
-  font-family: monospace;
-  position: absolute;
-  top: 1ch;
-  left: 78ch;
-  color: #a9a9a9;
-  text-decoration: none;
 }
