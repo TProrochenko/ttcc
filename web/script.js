@@ -89,7 +89,12 @@ class Editor {
 
   getSuggestion() {
     const complete = Module.cwrap("complete", "string", ["string"]);
-    var completion = complete(this.code.value).slice(this.code.value.length);
+    const start = performance.now();
+    const completion = complete(this.code.value).slice(this.code.value.length);
+    const end = performance.now();
+
+    console.log(`${(end - start) / (completion.length + 1)} ms/tok`);
+
     if (completion.length > 0) {
       this.code.style.caretColor = "hotpink";
     } else {
