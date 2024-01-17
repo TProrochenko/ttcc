@@ -1,3 +1,15 @@
+var Module = {
+  onRuntimeInitialized: function () {
+    this.initModel(this.lang.value);
+  },
+  print: function (text) {
+    console.log("stdout: " + text);
+  },
+  printErr: function (text) {
+    console.error("stderr: " + text);
+  },
+};
+
 class Editor {
   constructor() {
     this.code = document.getElementById("code-area");
